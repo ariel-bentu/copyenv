@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cloudfoundry/cli/plugin"
+	"code.cloudfoundry.org/cli/plugin"
 )
 
 type CopyEnv struct{}
@@ -71,6 +71,21 @@ func (c *CopyEnv) ExtractCredentialsJSON(envParent string, credKey string, outpu
 	return b, err
 }
 
+func (c *CopyEnv) ExtractEnvironmentMap(envParent string, output []string) (map[string]interface{}, error) {
+	
+	val := strings.Join(output, "")
+	var f interface{}
+	err := json.Unmarshal([]byte(val), &f)
+	if err != nil {
+		return nil, err
+	}
+
+	envJson := f.(map[string]interface{})
+	envMap := envJson[envParent].(map[string]interface{})
+
+	return envMap, nil
+}
+
 func (c *CopyEnv) ExportCredsAsShellVar(cred_key string, creds string) {
 	vcap_services := fmt.Sprintf("export %s='%s';", cred_key, creds)
 	fmt.Println(vcap_services)
@@ -93,6 +108,13 @@ func (c *CopyEnv) Run(cliConnection plugin.CliConnection, args []string) {
 	fatalIf(err)
 
 	if len(args) > 2 && args[2] == "--all" {
+		envMap,err := c.ExtractEnvironmentMap("environment_json", app_env)
+		fatalIf(err)
+		
+		for key, value := range envMap {
+			fmt.Println(fmt.Sprintf("export %s='%s';", key, value))
+		}
+		
 		c.ExtractAndExportCredentials("application_env_json", "VCAP_APPLICATION", app_env)
 		fmt.Println("")
 	}

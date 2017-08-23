@@ -1,11 +1,13 @@
 package main_test
 
 import (
-	. "."
 	"errors"
-	"github.com/cloudfoundry/cli/plugin/models"
-	"github.com/cloudfoundry/cli/plugin/pluginfakes"
-	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
+
+	. "copyenv"
+
+	"code.cloudfoundry.org/cli/plugin/models"
+	"code.cloudfoundry.org/cli/plugin/pluginfakes"
+	io_helpers "code.cloudfoundry.org/cli/util/testhelpers/io"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
